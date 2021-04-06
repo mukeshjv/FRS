@@ -46,3 +46,5 @@ This Project was built using the [Food.com Recipes and Interactions](https://www
 - Open the application in the browser at the following url:
 
         localhost:5000
+
+*Note*: Images for the suggested recipes are fetched using the Google Search API. The currently used free version serves only 100 requests per day.
