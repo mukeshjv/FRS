@@ -30,6 +30,8 @@ This Project was built using the [Food.com Recipes and Interactions](https://www
 - [Install Docker Engine](https://docs.docker.com/engine/install/)
 
 - [Install Docker Compose](https://docs.docker.com/compose/install/)
+
+- [Install Git LFS](https://git-lfs.github.com/)
   
 - Clone the repo
   
@@ -38,6 +40,10 @@ This Project was built using the [Food.com Recipes and Interactions](https://www
 - Move to working directory
 
         cd FRS
+        
+- Download Large Files using Git LFS
+
+        git lfs pull
 
 - Spin up the containers using docker-compose
 
