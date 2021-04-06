@@ -1,19 +1,15 @@
-from starlette.responses import JSONResponse, HTMLResponse
+from starlette.responses import JSONResponse
 from starlette.templating import Jinja2Templates
 import random
 import copy
-# templates = Jinja2Templates(directory='templates')
+templates = Jinja2Templates(directory='templates')
 
 #Default / route handling code
-
-
 async def homepage(request):
-    index_file = open("./view/index.html")
-    return HTMLResponse(index_file.read())
-    # return templates.TemplateResponse('index.html', {'request': request})
+    return templates.TemplateResponse('index.html', {'request': request})
+
 
 #/findrecipe route handling code
-
 
 async def findrecipe(request):
     #Extract the data received from the front-end
