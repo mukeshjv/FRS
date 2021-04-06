@@ -1,16 +1,15 @@
-from starlette.responses import JSONResponse
-from starlette.templating import Jinja2Templates
+from starlette.responses import JSONResponse, HTMLResponse
 import random
-import copy
-templates = Jinja2Templates(directory='templates')
+from time import sleep
+
 
 #Default / route handling code
 async def homepage(request):
-    return templates.TemplateResponse('index.html', {'request': request})
+    index_file = open("./view/index.html")
+    return HTMLResponse(index_file.read())
 
 
 #/findrecipe route handling code
-
 async def findrecipe(request):
     #Extract the data received from the front-end
     preferences = await request.form()
@@ -33,7 +32,6 @@ async def findrecipe(request):
     if dietp == "non-vegetarian":
         ingredients = [random.choice(nonveg)] + ingredients
 
-    original_ingredients = copy.deepcopy(ingredients)
     #min_time and max_time to query the database for the time preference
     min_time = 0
 
@@ -86,38 +84,24 @@ async def findrecipe(request):
                               {"nutrition.0": {"$gt": min_calories}}]},
                 ]
             }, limit=10)
+        sleep(0.33)
         if data.count() > 0:
             queries.append(data)
         print(ingredients[-1])
         ingredients.pop()
-
-    print(original_ingredients)
-
-    if data.count() == 0:
-        while(len(original_ingredients) > 1):
-            if(dietp == 'non-vegetarian'):
-                data = request.state.db.recipes.find(
-                    {"ingredients": {"$all": original_ingredients}}, limit=10)
-            else:
-                data = request.state.db.recipes.find({
-                    "$and": [
-                        {"ingredients": {'$all': original_ingredients}},
-                        {"tags": dietp}
-                    ]
-                }, limit=10)
-            if data.count() > 0:
-                queries.append(data)
-            original_ingredients.pop()
+        
 
     #Handle worst case i.e if no recipes are found
     if data.count() == 0:
-        data = request.state.db.recipes.find(limit=10)
+        data = request.state.db.recipes.find({"ingredients": ingredients[0]},limit=10)
+        sleep(0.5)
         queries.append(data)
 
     #Responses to send to the front-end in JSON format
     response = []
     print(data.count())
-
+    print(len(queries))
+    
     for query in queries:
         for ele in query:
             query = (ele['name'] + 'recipe food.com')
@@ -135,7 +119,7 @@ async def findrecipe(request):
                     'minutes': ele['minutes'],
                     'ingredients': ele['ingredients'],
                     'n_ingredients': str(ele['n_ingredients']),
-                    'url': url,
+                    'url': url
                 }
             )
     return JSONResponse({'response': response})
