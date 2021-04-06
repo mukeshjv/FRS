@@ -70,7 +70,7 @@ async def findrecipe(request):
                     {"$and": [{"nutrition.0": {"$lte": max_calories}},
                               {"nutrition.0": {"$gt": min_calories}}]},
                 ]
-            }, limit=20)
+            }, limit=10)
         #Vegetarian case handled
         else:
             data = request.state.db.recipes.find({
@@ -89,6 +89,8 @@ async def findrecipe(request):
             queries.append(data)
         print(ingredients[-1])
         ingredients.pop()
+        if data.count() > 9:
+            break
         
 
     #Handle worst case i.e if no recipes are found
