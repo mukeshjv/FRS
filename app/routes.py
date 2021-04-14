@@ -1,6 +1,5 @@
 from starlette.responses import JSONResponse, HTMLResponse
 import random
-from time import sleep
 
 
 #Default / route handling code
@@ -47,11 +46,10 @@ async def findrecipe(request):
         max_time = 10000000
 
     #min and max calories to query the database for the caloric preference
+    min_calories = 0
     if calories == 1:
         max_calories = 300
-        min_calories = 0
     else:
-        min_calories = 300
         max_calories = 1000000
 
     #Initialize queries list to store the results from the database query
@@ -84,10 +82,8 @@ async def findrecipe(request):
                               {"nutrition.0": {"$gt": min_calories}}]},
                 ]
             }, limit=10)
-        sleep(0.33)
         if data.count() > 0:
             queries.append(data)
-        print(ingredients[-1])
         ingredients.pop()
         if data.count() > 9:
             break
@@ -96,17 +92,15 @@ async def findrecipe(request):
     #Handle worst case i.e if no recipes are found
     if data.count() == 0:
         data = request.state.db.recipes.find({"ingredients": ingredients[0]},limit=10)
-        sleep(0.5)
+        queries.append(data)
+    else:
         queries.append(data)
 
     #Responses to send to the front-end in JSON format
     response = []
-    print(data.count())
-    print(len(queries))
     
     for query in queries:
         for ele in query:
-            query = (ele['name'] + 'recipe food.com')
             url = "https://www.food.com/recipe/"
             name = "".join(ele['name'].split())
             name = name.split()
